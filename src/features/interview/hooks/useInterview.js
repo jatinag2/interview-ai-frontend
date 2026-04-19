@@ -1,4 +1,5 @@
 
+
 import { InterviewContext } from "../interview.context";
 import { generateInterviewReport,getInterviewReportWithId,getAllReports ,generateresumepdf} from "../services/interview.api";
 
@@ -17,48 +18,55 @@ export const useInterview=()=>{
   
      const generateinterviewreport=async({jobdescribe,selfdescribe,resumeFile})=>{
         setloading(true)
-        let response=null;
+    
         try {
-             response=await generateInterviewReport({selfdescribe,jobdescribe,resumeFile})
+           const  response=await generateInterviewReport({selfdescribe,jobdescribe,resumeFile})
+           if(!response)return null
             setreport(response.interviewReport)
+            return response.interviewReport
         } catch (error) {
             console.log(error)
+            return null
         }finally{
             setloading(false)
         }
-        return response.interviewReport
      }
 
      const generatereportbyid=async(id)=>{
         setloading(true)   
-             let response=null;     
+      
         try {
-             response=await getInterviewReportWithId(id)
+            const response=await getInterviewReportWithId(id)
+            if(!response)return null
             setreport(response.interviewReport)
+            return response.interviewReport
         } catch (error) {
             console.log(error)
+            return null 
         }finally{
             setloading(false)
         }
-        return response.interviewReport
+      
         }
 
 
         const getallreports=async()=>{
             setloading(true)  
-             let response=null;          
+              
             try {
-                response=await getAllReports()
+               const response=await getAllReports()
                  const data = response?.interviewReports || []
                 setreports(data)
+                return data
             }
                 catch (error) {
                 console.log(error)
+                setreports([]);
+                return [];
             }
             finally{
                 setloading(false)
             }
-            return response.interviewReports
             }
 
             // useEffect(()=>{
@@ -72,9 +80,13 @@ export const useInterview=()=>{
 
             const getresumepdf=async(reportId)=>{  
                 setloading(true) 
-                let response=null
+          
                 try {
-                    response=await generateresumepdf(reportId)
+                    const response=await generateresumepdf(reportId)
+                    if(!response){
+                        console.log("No response received for resume PDF generation.");
+                        return null;
+                    }
                     const url=window.URL.createObjectURL(response)
                     const link=document.createElement('a')
             
