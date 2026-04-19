@@ -3,7 +3,7 @@ import axios from 'axios'
 
 
 const api=axios.create({                    //crete instace as it use in repeted call
-    baseURL:"http://localhost:3000",
+    baseURL:import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
     withCredentials:true
 })
 export async function register({username,email,password}) {
@@ -22,10 +22,8 @@ export async function register({username,email,password}) {
 
 export async function login({email,password}) {
     try {
-        const res=await axios.post("http://localhost:3000/api/auth/login",{
+        const res=await api.post("/api/auth/login",{
             email,password
-        },{
-            withCredentials:true
         })
         return res.data
     } catch (error) {
@@ -39,7 +37,7 @@ export async function logout() {
         const res= await api.get("/api/auth/logout")
         return res.data
     } catch (error) {
-        console.log(err)
+        console.log(error)
     }
 }
 
