@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api=axios.create({
-    baseURL:import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
+    baseURL:import.meta.env.VITE_API_BASE_URL ,
     withCredentials:true
 })
 
@@ -15,8 +15,8 @@ export async function generateInterviewReport({selfdescribe,jobdescribe,resumeFi
         const response=await api.post('/api/interview',formdata)
         return response.data
     } catch (error) {
-        console.log(error,error.response?.data)
-        return null;
+        console.log("getInterviewReport error:", error.response?.data || error.message);
+        return null; 
     }
 }
 
@@ -25,7 +25,8 @@ export async function getInterviewReportWithId(id) {
         const response=await api.get(`/api/interview/report/${id}`)
         return response.data
     } catch (error) {
-        console.log(error)
+       console.log("getInterviewReportWithId error:", error.response?.data || error.message);
+        return null; 
     }
 }
 
@@ -34,7 +35,8 @@ export async function getAllReports() {
         const response=await api.get(`/api/interview`)
         return response.data;
     } catch (error) {
-        console.log(error)
+       console.log("getallreports error:", error.response?.data || error.message);
+        return null; 
     }
 }
 
@@ -45,6 +47,7 @@ export async function generateresumepdf(reportId) {
         })
         return response.data;
     } catch (error) {
-        console.log(error)      
+       console.log("getresumepdf error:", error.response?.data || error.message);
+        return null;    
     }
 }
