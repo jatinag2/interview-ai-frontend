@@ -8,28 +8,46 @@ const Home = () => {
     useInterview();
   const [jobdescribe, setjobdescribe] = useState("");
   const [selfdescribe, setselfdescribe] = useState("");
+  const [resumeFile, setResumeFile] = useState(null);
   const resumeInputRef = useRef();
   const navigate = useNavigate();
   useEffect(() => {
     getallreports();
   }, []);
   const handleGenerateReport = async () => {
-    const resumeFile = resumeInputRef.current.files[0];
-    console.log("FILE:", resumeFile);
+    // Fallback to ref if state isn't set, though state should be accurate
+    const fileToUpload = resumeFile || resumeInputRef.current?.files[0];
+    console.log("FILE:", fileToUpload);
     const data = await generateinterviewreport({
       jobdescribe,
       selfdescribe,
-      resumeFile,
+      resumeFile: fileToUpload,
     });
-    console.log(data._id);
+    if (!data || !data._id) {
+      console.error("Invalid response:", data);
+      return;
+    }
     navigate(`/interview/${data._id}`);
   };
 
   if (loading) {
     return (
-      <main>
-        <h1>Loading your interview plan....</h1>
-      </main>
+      <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center px-6 py-10">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-500 border-opacity-75 mb-6"></div>
+        <h1 className="text-3xl font-bold mb-2">
+          Analyzing Profile & Job Description...
+        </h1>
+        <p className="text-gray-400 text-lg">
+          AI is generating your custom interview strategy. This may take up to
+          30 seconds.
+        </p>
+        <div className="mt-8 w-full max-w-md bg-gray-800 rounded-full h-2.5 overflow-hidden">
+          <div
+            className="bg-indigo-500 h-2.5 rounded-full animate-[pulse_2s_ease-in-out_infinite]"
+            style={{ width: "75%" }}
+          ></div>
+        </div>
+      </div>
     );
   }
 
@@ -72,9 +90,26 @@ const Home = () => {
             </div>
             <h2 className="text-xl font-normal mb-2 mt-4">Upload Resume</h2>
 
-            <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-lg h-40 cursor-pointer hover:border-indigo-400 transition">
-              <p className="text-gray-400">Click to upload (PDF)</p>
-              <input ref={resumeInputRef} hidden type="file" accept=".pdf" />
+            <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-lg h-40 cursor-pointer hover:border-indigo-400 transition bg-gray-900">
+              {resumeFile ? (
+                <div className="text-center">
+                  <p className="text-indigo-400 font-medium truncate px-4 max-w-xs">
+                    {resumeFile.name}
+                  </p>
+                  <p className="text-gray-500 text-sm mt-1">
+                    Click to change file
+                  </p>
+                </div>
+              ) : (
+                <p className="text-gray-400">Click to upload (PDF)</p>
+              )}
+              <input
+                ref={resumeInputRef}
+                onChange={(e) => setResumeFile(e.target.files[0])}
+                hidden
+                type="file"
+                accept=".pdf"
+              />
             </label>
 
             {/* OR */}

@@ -42,9 +42,7 @@ export async function getAllReports() {
 
 export async function generateresumepdf(reportId) {
     try {
-        const response=await api.get(`/api/interview/resume/pdf/${reportId}`,{
-            responseType:'blob'
-        })
+        const response = await api.get(`/api/interview/resume/pdf/${reportId}`);
         return response.data;
     } catch (error) {
        console.log("getresumepdf error:", error.response?.data || error.message);

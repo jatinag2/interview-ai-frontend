@@ -83,22 +83,36 @@ export const useInterview=()=>{
           
                 try {
                     const response=await generateresumepdf(reportId)
-                    if(!response){
+                    if(!response || !response.html){
                         console.log("No response received for resume PDF generation.");
                         return null;
                     }
-                    const url=window.URL.createObjectURL(response)
-                    const link=document.createElement('a')
-            
-                    link.href=url
-                    link.setAttribute('download',`resume_${reportId}.pdf`)
-                    document.body.appendChild(link)
-                    link.click()
+                    
+                    // Import html2pdf dynamically to avoid SSR issues if this was SSR (it's Vite though)
+                    const html2pdf = (await import('html2pdf.js')).default;
+                    
+                    const opt = {
+                        margin:       10,
+                        filename:     `resume_${reportId}.pdf`,
+                        image:        { type: 'jpeg', quality: 0.98 },
+                        html2canvas:  { scale: 2 },
+                        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+
+                    const container = document.createElement('div');
+                    container.innerHTML = response.html;
+                    container.style.position = 'absolute';
+                    container.style.left = '-9999px';
+                    document.body.appendChild(container);
+
+                    await html2pdf().set(opt).from(container).save();
+                    
+                    document.body.removeChild(container);
                 } catch (error) {
                     console.log(error)
                 }  finally{
                     setloading(false)
                 } 
-                }
+            }
   return {report,reports,loading,generateinterviewreport,generatereportbyid,getallreports,getresumepdf}
 }
